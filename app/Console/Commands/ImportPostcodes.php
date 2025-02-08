@@ -159,7 +159,7 @@ EOT;
                 $imported++;
             }
             DB::commit();
-            $this->info('Successfully imported {$imported} rows.');
+            $this->info("Successfully imported $imported rows.");
         } catch (Exception $e) {
             DB::rollBack();
             $this->error('An error occurred during the import: ' . $e->getMessage());

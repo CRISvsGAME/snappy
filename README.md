@@ -21,9 +21,32 @@
 ```sh
 git clone https://github.com/CRISvsGAME/snappy.git
 cd snappy
+composer install
+npm install
 npm run build
 php artisan migrate
 composer run dev
+```
+
+## (Optional) Seeding
+
+```sh
+# Importing 2,683,735 postcodes
+php artisan import:postcodes Data/ONSPD_NOV_2022_UK.csv 0 https://parlvid.mysociety.org/os/ONSPD/2022-11.zip
+```
+
+```sh
+# Seeding 100,000 stores (VERY EXPENSIVE computation and I/O operations)
+# Consider setting STORE_SEED_ROWS environment variable to the desired value
+
+# !!! DON'T run this with 100,000 if you don't have a super beefy PC !!!
+
+php artisan db:seed
+```
+
+```sh
+# For most use cases
+STORE_SEED_ROWS=1000 php artisan db:seed
 ```
 
 ## import:postcodes
@@ -68,11 +91,25 @@ curl -X PUT http://localhost:8000/api/stores/1 \
   -d '{"name": "Different Name"}'
 ```
 
-DELETE /api/stores/{store} – Delete a store.
+-   DELETE /api/stores/{store} – Delete a store.
 
 ```sh
 # Example:
 curl -X DELETE http://localhost:8000/api/stores/1 \
+  -H "Content-Type: application/json"
+```
+
+-   GET /api/stores/near/{postcode} - Return stores near to a postcode
+
+```sh
+curl -X GET http://localhost:8000/api/stores/near/HA5%202AH \
+  -H "Content-Type: application/json"
+```
+
+-   GET /api/stores/delivery/{postcode} - Return stores that can deliver to a given postcode
+
+```sh
+curl -X GET http://localhost:8000/api/stores/delivery/HA5%202AH \
   -H "Content-Type: application/json"
 ```
 
@@ -94,6 +131,32 @@ App\Http\Controllers\Api\StoreController
 ```php
 App\Http\Middleware\EnsureJsonResponse
 ```
+
+## Factories
+
+```php
+Database\Factories\StoreFactory
+```
+
+## Seeders
+
+```php
+Database\Seeders\StoreSeeder
+```
+
+## Tests
+
+```php
+Tests\Feature\StoreQueryPerformanceTest
+```
+
+```sh
+# NUMBER_OF_TESTS is OPTIONAL and defaults to 100
+# Example:
+NUMBER_OF_TESTS=200 php artisan test --filter=StoreQueryPerformanceTest
+```
+
+![Test Results](test-results.png)
 
 ## Improvements
 
@@ -118,11 +181,28 @@ App\Http\Middleware\EnsureJsonResponse
 
 -   Creating form request classes for data validation for separation of concerns
 
-## Known Issues
+### Grouping and Ordering Filters
+
+-   Using "GROUP BY" and "ORDER BY" to filter stores
+
+### API Versioning
+
+-   To comply with SOLID and REST principles, versioning of the API.
+
+### Testing
+
+-   Feature testing for the endpoints, though I focused on performance testing
+
+## Known Issues and Limitations
 
 -   SQLite doesn't enforce data types
+-   Used the "pcd" column only for postcodes (pay attention to spaces)
 -   The code has not been taken through refactoring
--   Inline documentation has not been added for brevity
+-   Non comprehensive inline documentation has been added for brevity
+-   Commit history has not been rebased and cleaned up
+-   Mixed casing between camel, snake and pascal case
+-   Use of Haversine formula to calculate distance (in kilometers)
+-   .env file is added to the source code for easiness (it shouldn't)
 
 ## License
 
