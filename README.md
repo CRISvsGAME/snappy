@@ -28,8 +28,71 @@ composer run dev
 
 ## import:postcodes
 
+The `import:postcodes` command is defined in the file located at:
+
+```php
+App\Console\Commands\ImportPostcodes
+```
+
+You can view all available options by running:
+
 ```sh
 php artisan import:postcodes --help
+```
+
+## API Endpoints
+
+-   GET /api/stores – List all stores.
+
+```sh
+#Example:
+curl -X GET http://localhost:8000/api/stores \
+  -H "Content-Type: application/json"
+```
+
+-   POST /api/stores – Create a new store.
+
+```sh
+# Example:
+curl -X POST http://localhost:8000/api/stores \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Store 1", "lat": 40.712776, "long": -74.005974, "is_open": true, "store_type": "Grocery", "max_delivery_distance": 15}'
+```
+
+-   PUT/PATCH /api/stores/{store} – Update a store.
+
+```sh
+# Example:
+curl -X PUT http://localhost:8000/api/stores/1 \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Different Name"}'
+```
+
+DELETE /api/stores/{store} – Delete a store.
+
+```sh
+# Example:
+curl -X DELETE http://localhost:8000/api/stores/1 \
+  -H "Content-Type: application/json"
+```
+
+## Models
+
+```php
+App\Models\Postcode
+App\Models\Store
+```
+
+## Controllers
+
+```php
+App\Http\Controllers\Api\StoreController
+```
+
+## Middlewares
+
+```php
+App\Http\Middleware\EnsureJsonResponse
 ```
 
 ## Improvements
@@ -38,6 +101,28 @@ php artisan import:postcodes --help
 
 -   Thorough validation
 -   Flexibility and configuration
+
+### Database
+
+-   Production database like MySQL or PostgreSQL to enforce data types
+
+### Models
+
+-   Mutators and Accessors to set and retrieve data
+
+### Migrations
+
+-   Use of more accurate data types for columns
+
+### Requests
+
+-   Creating form request classes for data validation for separation of concerns
+
+## Known Issues
+
+-   SQLite doesn't enforce data types
+-   The code has not been taken through refactoring
+-   Inline documentation has not been added for brevity
 
 ## License
 
